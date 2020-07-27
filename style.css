@@ -1,0 +1,40 @@
+.jumboCenter {
+  text-align: center;
+  background-color: bisque;
+}
+
+.btnColor {
+  background-color: cadetblue;
+  border-color: rgb(79, 127, 129);
+  color: black;
+}
+
+.btnStyle {
+  margin: 5px;
+}
+
+.alertStyle {
+  border-color: 2px solid black;
+}
+
+.finalP {
+  margin: 0px;
+}
+
+#name {
+  padding-top: 5px;
+}
+
+#buttonArray {
+  display: block;
+}
+
+#scoreBoard, #timeBoard {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#scoreHeading {
+  text-align: center;
+  margin-bottom: 15px;
+}
