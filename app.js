@@ -42,7 +42,7 @@ let questions = [
   },
   {
     "question": "Which tag links stylesheets to the page?",
-    "correct_answer": "give",
+    "correct_answer": "<style>",
     "answers": [
       "let",
       "<style>",
@@ -107,7 +107,7 @@ let score = 0
 let time = 100
 let myIndex = 0
 let permission = true
-
+let tablePermission = true
 //Function that is called everytime 
 function newQuestion() {
 
@@ -164,11 +164,12 @@ document.addEventListener('click', event => {
       score++
       document.getElementById('score').textContent = score
 
-      //Creates div to alert the user 
+      //Creates div to alert the user thier answer was right
       let resultElem = document.createElement('div')
       resultElem.className = 'alert alert-success'
       resultElem.textContent = 'Correct Answer! Good Job!'
       document.getElementById('results').append(resultElem)
+      // permission blocks multiple button clicks & timeout gives buffer before new question
       permission = false
       setTimeout(() => {
         newQuestion()
@@ -176,13 +177,18 @@ document.addEventListener('click', event => {
 
       }, 2000)
 
+      //Checks if the answer is wrong
     } else if (event.target.dataset.answer !== questions[myIndex].correct_answer) {
       console.log('Wrong!')
+
+      //Creates div to alert the user thier answer was wrong
       let resultElem = document.createElement('div')
       resultElem.className = 'alert alert-danger alertStyle'
-      resultElem.textContent = `Incorrect Answer! The correct was: ${questions[myIndex].correct_answer}`
+      resultElem.textContent = `Incorrect Answer! The correct answer was: ${questions[myIndex].correct_answer}`
       document.getElementById('results').append(resultElem)
+      //takes time away for wrong answers
       time = time - 10
+      // permission blocks multiple button clicks & timeout gives buffer before new question
       permission = false
       setTimeout(() => {
         newQuestion()
@@ -190,14 +196,17 @@ document.addEventListener('click', event => {
 
       }, 2000)
     }
+    //After the question is checked go to the next object in the array
     myIndex++
   }
-
 })
 
+//Function that is called when the quiz is over.
 function scoreScreen() {
+  //variable to show how much time the user had left
   var finalTime = time
   
+  //Changes the page's HTML to show score and leaderboard.
   document.getElementById('startScreen').innerHTML = `
     <h1>End of Quiz!</h1>
     
@@ -219,15 +228,24 @@ function scoreScreen() {
   `
 }
 
-//Quinton's Code
+//Quinton's Code (Modified):
+
+// creates a variable for submit score and stores it into the leaderboard
 const submitScore = submission => {
-  console.log(submission)
+  //either pulls existing leaderboard or creates a new one.
   let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || []
+  //pushes the submission object into the leaderboard array
   leaderboard.push(submission)
+  //Sets the newly added to array into the local storage.
   localStorage.setItem('leaderboard', JSON.stringify(leaderboard))
+  //function used to sort the arrat from highest score to lowest score.
   leaderboard.sort((a, b) => {
     return b.score - a.score
   })
+
+  //Leaderboard Table creation
+
+  // creating the main tavle and making the table head
   let tableElem = document.createElement('table')
   tableElem.className = 'table tableStyle'
   tableElem.innerHTML = `
@@ -239,7 +257,9 @@ const submitScore = submission => {
         </tr>
       </thead>
     `
+  // Creating the table body
   let bodyElem = document.createElement('tbody')
+  //Creating a loop that creates rows based off of the leaderboard array
   for (let i = 0; i < leaderboard.length; i++) {
     let rowElem = document.createElement('tr')
     rowElem.innerHTML = `
@@ -247,20 +267,29 @@ const submitScore = submission => {
         <td>${leaderboard[i].username}</td>
         <td>${leaderboard[i].score}</td>
       `
+    //Takes all the newly created rows and appends them into the table body
     bodyElem.append(rowElem)
   }
+  //Takes the body element and appends it into the table element
   tableElem.append(bodyElem)
+  // Appends the table onto the page
   document.getElementById('table').append(tableElem)
 }
 
+//Event listener for the final submit score button
 document.addEventListener('click', event => {
-  if (event.target.id === 'submitScore') {
+  //checks if the submit button was pressed and also checks if its BEEN pressed before
+  if (event.target.id === 'submitScore' && tablePermission) {
     event.preventDefault()
+    //Calls the submit score function and inputs the object of varibles into it
     submitScore({
       username: document.getElementById('nameInput').value,
       score: score
     })
-  
+  //Checks if the table has already been created
+  tablePermission = false
+  //Changes the button to be a back button and takes you back to the home page
+  document.getElementById('nameInput').textContent = ''
+  document.getElementById('submitScore').textContent = 'Try Again!'
   }
 })
-scoreScreen()
