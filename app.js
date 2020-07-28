@@ -1,3 +1,4 @@
+//Array of question objects to call during changing code
 let questions = [
   {
     "question": "Which is not a way to define a variable in JS?",
@@ -101,23 +102,30 @@ let questions = [
   },
 ]
 
+//Defining global variables to manipulate
 let score = 0
 let time = 100
 let myIndex = 0
+let permission = true
 
-
+//Function that is called everytime 
 function newQuestion() {
 
+  //If question is past the last item in the array go to score screen and stop function
   if (myIndex >= 10) {
     scoreScreen()
     return
   }
+
+  //Changes content in previous HMTL to add questions
   document.getElementById('results').innerHTML = ` `
   document.getElementById('overBtn').textContent = 'Choose One!'
+  document.getElementById("questions").className = 'boldQ'
   document.getElementById("questions").textContent = questions[myIndex].question
 
   let answers = questions[myIndex].answers
 
+  //Creates buttons for the user to pick from
   document.getElementById('answers').innerHTML = ` `
   for (let i = 0; i < answers.length; i++) {
     let answerElem = document.createElement('button')
@@ -128,41 +136,59 @@ function newQuestion() {
   }
 }
 
+//Function that handles time and freezes time when the game ends 
 function timeScore () {
 
-  timeLeft = setInterval(() => {
-    time--
-    document.getElementById('timeBoard').textContent = time
-    if (time <= 0) {
+  var timeLeft = setInterval(function () {
+    if (time > 0 && myIndex < 10) {
+      time--
+      document.getElementById('time').textContent = time
+    } else {
       clearInterval(timeLeft)
-      scoreScreen()
+      scoreScreen() 
     }
   }, 1000)
 }
 
+//Event listeners for the start button to start the Quiz
 document.getElementById("startBtn").addEventListener('click', timeScore)
 document.getElementById("startBtn").addEventListener('click', newQuestion)
 
+//Click event that checks the answer and changes variables depending on correctness.
 document.addEventListener('click', event => {
-  if (event.target.classList.contains('answers')) {
+  if (event.target.classList.contains('answers') && permission) {
 
+    //Checks if the answer is correct
     if (event.target.dataset.answer === questions[myIndex].correct_answer) {
-      console.log('CORRECT!')
+      //Adds to score and changes score text
       score++
       document.getElementById('score').textContent = score
+
+      //Creates div to alert the user 
       let resultElem = document.createElement('div')
       resultElem.className = 'alert alert-success'
-      resultElem.textContent = 'Correct Answer!'
+      resultElem.textContent = 'Correct Answer! Good Job!'
       document.getElementById('results').append(resultElem)
-      setTimeout(newQuestion, 2000);
+      permission = false
+      setTimeout(() => {
+        newQuestion()
+        permission = true
+
+      }, 2000)
 
     } else if (event.target.dataset.answer !== questions[myIndex].correct_answer) {
       console.log('Wrong!')
       let resultElem = document.createElement('div')
       resultElem.className = 'alert alert-danger alertStyle'
-      resultElem.textContent = 'Incorrect Answer!'
+      resultElem.textContent = `Incorrect Answer! The correct was: ${questions[myIndex].correct_answer}`
       document.getElementById('results').append(resultElem)
-      setTimeout(newQuestion, 2000);
+      time = time - 10
+      permission = false
+      setTimeout(() => {
+        newQuestion()
+        permission = true
+
+      }, 2000)
     }
     myIndex++
   }
@@ -170,10 +196,15 @@ document.addEventListener('click', event => {
 })
 
 function scoreScreen() {
+  var finalTime = time
+  
   document.getElementById('startScreen').innerHTML = `
     <h1>End of Quiz!</h1>
     
-    <p class="finalP">How did you do?</p>
+    <h3>Your Final Score was: ${score}</h3>
+    <h3>You had ${finalTime} seconds left to spare!</h3>
+
+    <p class="finalP">How do you stack up?</p>
     <p class="finalP">Save your name and score to see how you compete!</p>
 
     <form id="highscoreInput">
@@ -188,10 +219,6 @@ function scoreScreen() {
   `
 }
 
-// scoreScreen()
-
-// let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || []
-
 //Quinton's Code
 const submitScore = submission => {
   console.log(submission)
@@ -202,7 +229,7 @@ const submitScore = submission => {
     return b.score - a.score
   })
   let tableElem = document.createElement('table')
-  tableElem.className = 'table'
+  tableElem.className = 'table tableStyle'
   tableElem.innerHTML = `
       <thead>
         <tr>
@@ -223,7 +250,7 @@ const submitScore = submission => {
     bodyElem.append(rowElem)
   }
   tableElem.append(bodyElem)
-  document.getElementById('startScreen').append(tableElem)
+  document.getElementById('table').append(tableElem)
 }
 
 document.addEventListener('click', event => {
@@ -233,14 +260,7 @@ document.addEventListener('click', event => {
       username: document.getElementById('nameInput').value,
       score: score
     })
+  
   }
 })
-
-// scoreScreen()
-
-  // submitScore({
-  //   username: document.getElementById('nameInput').value,
-  //   score: score
-  // })
-
-  // localStorage.removeItem('leaderboard')
+scoreScreen()

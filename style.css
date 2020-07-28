@@ -1,6 +1,39 @@
+body {
+  background-color: bisque;
+}
+
+#table {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#name {
+  padding-top: 5px;
+}
+
+#buttonArray {
+  display: block;
+}
+
+#scoreBoard, #timeBoard {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#scoreHeading {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+#submitScore {
+  margin-bottom: 10px;
+}
+
 .jumboCenter {
   text-align: center;
   background-color: bisque;
+  padding-bottom: 32px;
 }
 
 .btnColor {
@@ -21,20 +54,10 @@
   margin: 0px;
 }
 
-#name {
-  padding-top: 5px;
+.tableStyle {
+  align-content: center;
 }
 
-#buttonArray {
-  display: block;
-}
-
-#scoreBoard, #timeBoard {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-#scoreHeading {
-  text-align: center;
-  margin-bottom: 15px;
+.boldQ {
+  font-weight: bold;
 }
