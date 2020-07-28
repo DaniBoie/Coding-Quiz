@@ -105,7 +105,9 @@ let score = 0
 let time = 100
 let myIndex = 0
 
+
 function newQuestion() {
+
   if (myIndex >= 10) {
     scoreScreen()
     return
@@ -126,6 +128,19 @@ function newQuestion() {
   }
 }
 
+function timeScore () {
+
+  timeLeft = setInterval(() => {
+    time--
+    document.getElementById('timeBoard').textContent = time
+    if (time <= 0) {
+      clearInterval(timeLeft)
+      scoreScreen()
+    }
+  }, 1000)
+}
+
+document.getElementById("startBtn").addEventListener('click', timeScore)
 document.getElementById("startBtn").addEventListener('click', newQuestion)
 
 document.addEventListener('click', event => {
@@ -169,61 +184,63 @@ function scoreScreen() {
       </div>
     <form>
 
-    <button class="btn btn-dark" id="nameBtn">Submit!</button>
+    <button class="btn btn-dark" id="submitScore">Submit!</button>
   `
 }
 
 // scoreScreen()
 
-let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || []
+// let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || []
 
-
-
-document.getElementById("nameBtn").addEventListener('click', event => {
-  event.preventDefault()
-  submitScore({
-    username: document.getElementById('username').value,
-    score: score
+//Quinton's Code
+const submitScore = submission => {
+  console.log(submission)
+  let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || []
+  leaderboard.push(submission)
+  localStorage.setItem('leaderboard', JSON.stringify(leaderboard))
+  leaderboard.sort((a, b) => {
+    return b.score - a.score
   })
+  let tableElem = document.createElement('table')
+  tableElem.className = 'table'
+  tableElem.innerHTML = `
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">username</th>
+          <th scope="col">score</th>
+        </tr>
+      </thead>
+    `
+  let bodyElem = document.createElement('tbody')
+  for (let i = 0; i < leaderboard.length; i++) {
+    let rowElem = document.createElement('tr')
+    rowElem.innerHTML = `
+        <th scope="row">${i + 1}</th>
+        <td>${leaderboard[i].username}</td>
+        <td>${leaderboard[i].score}</td>
+      `
+    bodyElem.append(rowElem)
+  }
+  tableElem.append(bodyElem)
+  document.getElementById('startScreen').append(tableElem)
+}
 
-
-
+document.addEventListener('click', event => {
+  if (event.target.id === 'submitScore') {
+    event.preventDefault()
+    submitScore({
+      username: document.getElementById('nameInput').value,
+      score: score
+    })
+  }
 })
 
+// scoreScreen()
 
-function leaderboardCreate(){
-  let hsTable = document.createElement('table')
-  hsTable.className = 'table'
-}
-  // < h1 id = "scoreHeading" > Highscore Leaderboards:</ >
+  // submitScore({
+  //   username: document.getElementById('nameInput').value,
+  //   score: score
+  // })
 
-  //   <table class="table">
-  //     <thead>
-  //       <tr>
-  //         <th scope="col">#</th>
-  //         <th scope="col">First</th>
-  //         <th scope="col">Last</th>
-  //         <th scope="col">Handle</th>
-  //       </tr>
-  //     </thead>
-  //     <tbody>
-  //       <tr>
-  //         <th scope="row">1</th>
-  //         <td>Mark</td>
-  //         <td>Otto</td>
-  //         <td>@mdo</td>
-  //       </tr>
-  //       <tr>
-  //         <th scope="row">2</th>
-  //         <td>Jacob</td>
-  //         <td>Thornton</td>
-  //         <td>@fat</td>
-  //       </tr>
-  //       <tr>
-  //         <th scope="row">3</th>
-  //         <td>Larry</td>
-  //         <td>the Bird</td>
-  //         <td>@twitter</td>
-  //       </tr>
-  //     </tbody>
-  //   </table>
+  // localStorage.removeItem('leaderboard')
